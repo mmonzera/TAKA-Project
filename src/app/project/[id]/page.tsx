@@ -25,6 +25,7 @@ export default function ProjectPage() {
   const [docDialogOpen, setDocDialogOpen] = useState(false);
   const [docTitle, setDocTitle] = useState("");
   const [docUrl, setDocUrl] = useState("");
+  const [docMenuOpen, setDocMenuOpen] = useState(false);
 
   const project = projects.find((p) => p.id === id);
   const docs = getProjectDocs(id);
@@ -72,6 +73,7 @@ export default function ProjectPage() {
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           
+          {/* Notifications + Reminder Settings */}
           <Popover open={notifOpen} onOpenChange={setNotifOpen}>
             <PopoverTrigger render={
               <Button variant="outline" size="icon" className="relative h-8 w-8 text-muted-foreground hover:text-foreground">
@@ -84,6 +86,7 @@ export default function ProjectPage() {
               </Button>
             } />
             <PopoverContent align="end" sideOffset={8} className="w-[calc(100vw-2rem)] sm:w-[340px] p-0 rounded-lg shadow-xl overflow-hidden flex flex-col">
+              {/* Notifications header */}
               <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border bg-muted/30">
                 <span className="text-xs font-semibold flex items-center gap-2">
                   <Bell className="h-4 w-4 text-primary" />
@@ -95,7 +98,8 @@ export default function ProjectPage() {
                   </Button>
                 )}
               </div>
-              <ScrollArea className="max-h-[240px]">
+              {/* Notifications list */}
+              <ScrollArea className="max-h-[200px]">
                 {notifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-muted-foreground opacity-40">
                     <Bell className="h-8 w-8 mb-2" />
@@ -112,21 +116,22 @@ export default function ProjectPage() {
                   </div>
                 )}
               </ScrollArea>
-              <div className="p-4 border-t border-border bg-muted/10 space-y-3">
-                <span className="text-xs font-semibold flex items-center gap-2 mb-1">
+              {/* Reminder Settings - merged inside */}
+              <div className="p-4 border-t border-border space-y-3">
+                <span className="text-xs font-semibold flex items-center gap-2">
                   <Settings2 className="h-4 w-4 text-primary" /> Reminder Settings
                 </span>
-                <div className="space-y-3">
-                  <label className="text-[11px] font-medium text-muted-foreground">Due Date (days before)</label>
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block leading-relaxed">Due Date (days before)</label>
                   <Input value={prefs.dueDateDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, dueDateDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0, 1, 3, 5" className="h-8 text-xs bg-muted/50 border-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-3">
-                    <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5"><Clock className="h-3 w-3" /> Confirming</label>
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block flex items-center gap-1.5"><Clock className="h-3 w-3" /> Confirming</label>
                     <Input value={prefs.confirmingDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, confirmingDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0" className="h-8 text-xs bg-muted/50 border-none" />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5"><Bell className="h-3 w-3" /> Reminding</label>
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block flex items-center gap-1.5"><Bell className="h-3 w-3" /> Reminding</label>
                     <Input value={prefs.remindingDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, remindingDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0" className="h-8 text-xs bg-muted/50 border-none" />
                   </div>
                 </div>
@@ -139,7 +144,7 @@ export default function ProjectPage() {
           </Popover>
 
           {/* Related Docs */}
-          <Popover>
+          <Popover open={docMenuOpen} onOpenChange={setDocMenuOpen}>
             <PopoverTrigger render={
               <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                 <Link className="h-4 w-4" />
@@ -179,12 +184,12 @@ export default function ProjectPage() {
                   } />
                   <DialogContent className="rounded-lg shadow-xl">
                     <DialogTitle className="text-sm font-semibold">Add Related Doc</DialogTitle>
-                    <div className="space-y-3 pt-2">
-                      <div className="space-y-1">
+                    <div className="space-y-4 pt-2">
+                      <div className="space-y-2">
                         <label className="text-xs font-medium text-muted-foreground">Title</label>
                         <Input placeholder="e.g., Design Spec" value={docTitle} onChange={(e) => setDocTitle(e.target.value)} className="h-9 text-sm" autoFocus />
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <label className="text-xs font-medium text-muted-foreground">URL</label>
                         <Input placeholder="https://docs.google.com/..." value={docUrl} onChange={(e) => setDocUrl(e.target.value)} className="h-9 text-sm" onKeyDown={(e) => { if (e.key === "Enter") handleAddDoc(); }} />
                       </div>
