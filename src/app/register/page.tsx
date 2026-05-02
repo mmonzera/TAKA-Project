@@ -35,7 +35,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--board-bg)]">
-      <header className="flex items-center justify-between px-6 h-12 bg-[var(--header-bg)] border-b border-border shrink-0">
+      <header className="flex items-center justify-between px-4 sm:px-6 h-12 bg-[var(--header-bg)] border-b border-border shrink-0">
         <div className="flex items-center gap-2">
           <Kanban className="h-5 w-5 text-primary" />
           <span className="text-sm font-bold text-foreground">TAKA</span>
@@ -53,15 +53,15 @@ export default function RegisterPage() {
           </CardHeader>
           <CardContent className="px-6 pb-6">
             <form onSubmit={handleRegister} className="space-y-4">
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Full Name</label>
                 <Input placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} className="h-10 text-sm" autoFocus />
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Email</label>
                 <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10 text-sm" />
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Password</label>
                 <div className="relative">
                   <Input type={showPw ? "text" : "password"} placeholder="Min 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} className="h-10 text-sm pr-10" />

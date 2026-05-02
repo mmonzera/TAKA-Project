@@ -50,7 +50,7 @@ export default function ProjectPage() {
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      <header className="flex items-center justify-between px-4 sm:px-6 h-11 border-b border-border bg-card shrink-0">
+      <header className="flex items-center justify-between px-4 sm:px-6 h-12 bg-[var(--header-bg)] border-b border-border shrink-0">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => router.push("/")} className="h-7 w-7 rounded-md text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
@@ -76,7 +76,7 @@ export default function ProjectPage() {
                 )}
               </Button>
             } />
-            <PopoverContent align="end" sideOffset={8} className="w-[340px] p-0 rounded-lg shadow-xl overflow-hidden flex flex-col">
+            <PopoverContent align="end" sideOffset={8} className="w-[calc(100vw-2rem)] sm:w-[340px] p-0 rounded-lg shadow-xl overflow-hidden flex flex-col">
               <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border bg-muted/30">
                 <span className="text-xs font-semibold flex items-center gap-2">
                   <Bell className="h-4 w-4 text-primary" />
@@ -111,16 +111,16 @@ export default function ProjectPage() {
                 <span className="text-xs font-semibold flex items-center gap-2 mb-1">
                   <Settings2 className="h-4 w-4 text-primary" /> Reminder Settings
                 </span>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <label className="text-[11px] font-medium text-muted-foreground">Due Date (days before)</label>
                   <Input value={prefs.dueDateDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, dueDateDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0, 1, 3, 5" className="h-8 text-xs bg-muted/50 border-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5"><Clock className="h-3 w-3" /> Confirming</label>
                     <Input value={prefs.confirmingDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, confirmingDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0" className="h-8 text-xs bg-muted/50 border-none" />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5"><Bell className="h-3 w-3" /> Reminding</label>
                     <Input value={prefs.remindingDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, remindingDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0" className="h-8 text-xs bg-muted/50 border-none" />
                   </div>

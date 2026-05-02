@@ -68,7 +68,7 @@ export function TaskDetailSheet() {
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col border-l border-border" showCloseButton={false}>
-        <SheetHeader className="px-5 pt-5 pb-0 shrink-0">
+        <SheetHeader className="px-4 sm:px-5 pt-5 pb-0 shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <input value={t} onChange={(e) => setT(e.target.value)} className="w-full text-sm font-semibold bg-transparent border-none outline-none focus:ring-0 p-0" placeholder="Task title..." />
@@ -83,9 +83,9 @@ export function TaskDetailSheet() {
             </div>
           </div>
         </SheetHeader>
-        <ScrollArea className="flex-1 px-5 py-4">
+        <ScrollArea className="flex-1 px-4 sm:px-5 py-4">
           <div className="space-y-5">
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><ArrowUp className="h-3 w-3" />Priority</label>
               <div className="flex gap-1.5">
                 {priorityOptions.map((op) => (
@@ -102,16 +102,16 @@ export function TaskDetailSheet() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><User className="h-3 w-3" />Assigned By</label>
                 <Input value={a} onChange={(e) => setA(e.target.value)} placeholder="Who assigned this?" className="h-9 text-sm" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Due Date</label>
                 <Input type="date" value={dd} onChange={(e) => setDd(e.target.value)} className="h-9 text-sm" />
               </div>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground">Description</label>
               <Textarea value={d} onChange={(e) => setD(e.target.value)} placeholder="Add details, references..." className="min-h-[100px] text-sm" />
             </div>
@@ -141,7 +141,7 @@ export function TaskDetailSheet() {
                 <Plus className="h-3.5 w-3.5 mr-1" /> Add Log
               </Button>
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {logs.length === 0 ? (
                 <p className="text-xs text-muted-foreground/60 text-center py-4">No activity logs yet.</p>
               ) : (
