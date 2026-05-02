@@ -83,17 +83,17 @@ export function TaskDetailSheet() {
             </div>
           </div>
         </SheetHeader>
-        <ScrollArea className="flex-1 px-4 sm:px-5 py-4">
-          <div className="space-y-5">
-            <div className="space-y-3">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><ArrowUp className="h-3 w-3" />Priority</label>
-              <div className="flex gap-1.5">
+        <ScrollArea className="flex-1 px-6 py-6">
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-3">
+              <label className="text-[13px] font-semibold text-foreground/80 flex items-center gap-1.5 ml-0.5"><ArrowUp className="h-3.5 w-3.5 text-primary/70" />Priority</label>
+              <div className="flex flex-wrap gap-2">
                 {priorityOptions.map((op) => (
                   <Button
                     key={op.value}
                     variant="outline"
                     size="sm"
-                    className={`h-7 text-[11px] rounded-md px-2.5 border ${p === op.value ? op.color + " ring-1 ring-inset ring-current" : "border-border text-muted-foreground"}`}
+                    className={`h-8 text-xs rounded-lg px-4 border ${p === op.value ? op.color + " ring-1 ring-inset ring-current font-bold" : "border-border text-muted-foreground bg-muted/20"}`}
                     onClick={() => setP(op.value)}
                   >
                     {op.label}
@@ -101,19 +101,19 @@ export function TaskDetailSheet() {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-3">
-                <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><User className="h-3 w-3" />Assigned By</label>
-                <Input value={a} onChange={(e) => setA(e.target.value)} placeholder="Who assigned this?" className="h-9 text-sm" />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[13px] font-semibold text-foreground/80 flex items-center gap-1.5 ml-0.5"><User className="h-3.5 w-3.5 text-primary/70" />Assigned By</label>
+                <Input value={a} onChange={(e) => setA(e.target.value)} placeholder="Who assigned this?" className="h-10 text-sm bg-muted/30 border-muted-foreground/20" />
               </div>
-              <div className="space-y-3">
-                <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Due Date</label>
-                <Input type="date" value={dd} onChange={(e) => setDd(e.target.value)} className="h-9 text-sm" />
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[13px] font-semibold text-foreground/80 flex items-center gap-1.5 ml-0.5"><Calendar className="h-3.5 w-3.5 text-primary/70" />Due Date</label>
+                <Input type="date" value={dd} onChange={(e) => setDd(e.target.value)} className="h-10 text-sm bg-muted/30 border-muted-foreground/20" />
               </div>
             </div>
-            <div className="space-y-3">
-              <label className="text-xs font-medium text-muted-foreground">Description</label>
-              <Textarea value={d} onChange={(e) => setD(e.target.value)} placeholder="Add details, references..." className="min-h-[100px] text-sm" />
+            <div className="flex flex-col gap-2.5">
+              <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Description</label>
+              <Textarea value={d} onChange={(e) => setD(e.target.value)} placeholder="Add details, references..." className="min-h-[140px] text-sm bg-muted/30 border-muted-foreground/20 leading-relaxed p-4" />
             </div>
           </div>
           <Separator className="my-5" />

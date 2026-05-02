@@ -216,16 +216,16 @@ export default function DashboardPage() {
                       <Plus className="h-4 w-4 mr-1.5" /> New Project
                     </Button>
                   } />
-                  <DialogContent className="rounded-lg shadow-xl">
-                    <DialogTitle className="text-sm font-semibold">Create Project</DialogTitle>
-                    <div className="space-y-4 pt-2">
-                      <div className="space-y-3">
-                        <label className="text-xs font-medium text-muted-foreground">Project Name</label>
-                        <Input placeholder="e.g., Marketing Campaign" value={projectName} onChange={(e) => setProjectName(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleCreateProject(); }} />
+                    <DialogContent className="sm:max-w-[400px] rounded-xl shadow-2xl border-none p-6">
+                      <DialogTitle className="text-lg font-bold tracking-tight">Create Project</DialogTitle>
+                      <div className="flex flex-col gap-6 pt-4">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Project Name</label>
+                          <Input placeholder="e.g., Marketing Campaign" value={projectName} onChange={(e) => setProjectName(e.target.value)} className="h-10 text-sm bg-muted/30 border-muted-foreground/20" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleCreateProject(); }} />
+                        </div>
+                        <Button onClick={handleCreateProject} className="w-full h-11 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 mt-2" disabled={!projectName.trim()}>Create Project</Button>
                       </div>
-                      <Button onClick={handleCreateProject} className="w-full h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-none" disabled={!projectName.trim()}>Create</Button>
-                    </div>
-                  </DialogContent>
+                    </DialogContent>
                 </Dialog>
               </div>
             </div>
