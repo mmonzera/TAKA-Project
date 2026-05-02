@@ -13,7 +13,8 @@ import { toast } from "sonner";
 import type { Priority } from "@/lib/types";
 
 export function KanbanBoardProject({ projectId }: { projectId: string }) {
-  const { columns, searchQuery, setSearchQuery, addColumn, addTask, moveTask, tasks, filteredTasks } = useKanbanStore();
+  const store = useKanbanStore();
+  const { columns, searchQuery, setSearchQuery } = store;
   const [addOpen, setAddOpen] = useState(false);
   const [addColOpen, setAddColOpen] = useState(false);
   const [newColTitle, setNewColTitle] = useState("");
@@ -30,50 +31,51 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
 
   const firstColId = projColumns[0]?.id || "";
 
-  const { todo, progress, done, total } = useMemo(() => {
+  const { todo, progress, done } = useMemo(() => {
     const colMap = new Map(columns.map((c) => [c.id, c.title]));
-    const pt = tasks.filter((t) => t.project_id === projectId);
+    const pt = store.tasks.filter((t) => t.project_id === projectId);
     return {
       total: pt.length,
       todo: pt.filter((t) => colMap.get(t.column_id) === "To Do").length,
       progress: pt.filter((t) => colMap.get(t.column_id) === "On Progress").length,
       done: pt.filter((t) => colMap.get(t.column_id) === "Success").length,
     };
-  }, [tasks, columns, projectId]);
+  }, [store.tasks, columns, projectId]);
 
   const onDragEnd = useCallback((r: DropResult) => {
     if (!r.destination) return;
     if (r.source.droppableId === r.destination.droppableId && r.source.index === r.destination.index) return;
-    moveTask(r.draggableId, r.destination.droppableId, r.destination.index);
-  }, [moveTask]);
+    store.moveTask(r.draggableId, r.destination.droppableId, r.destination.index);
+  }, [store]);
 
-  const addCol = useCallback(async () => {
+  const addCol = useCallback(() => {
     if (!newColTitle.trim()) return;
     if (projColumns.length >= 10) { toast.error("Max 10 columns"); return; }
-    await addColumn({ title: newColTitle.trim(), position: projColumns.length, project_id: projectId });
+    store.addColumn({ title: newColTitle.trim(), position: projColumns.length, project_id: projectId });
     setNewColTitle(""); setAddColOpen(false);
-  }, [newColTitle, projColumns.length, projectId, addColumn]);
+    toast.success("Column added");
+  }, [newColTitle, projColumns.length, projectId, store]);
 
-  const handleAddTask = useCallback(async () => {
+  const handleAddTask = useCallback(() => {
     if (!newTaskTitle.trim() || !newTaskCol) return;
-    await addTask({
+    store.addTask({
       title: newTaskTitle.trim(),
       column_id: newTaskCol,
       project_id: projectId,
-      position: filteredTasks(newTaskCol).length,
+      position: store.filteredTasks(newTaskCol).length,
       assigned_by: newTaskAssigned.trim() || undefined,
       due_date: newTaskDue || undefined,
       priority: newTaskPriority,
     });
     setNewTaskTitle(""); setNewTaskAssigned(""); setNewTaskDue(""); setNewTaskPriority("medium"); setNewTaskCol(firstColId);
     setAddOpen(false);
-  }, [newTaskTitle, newTaskAssigned, newTaskDue, newTaskPriority, newTaskCol, projectId, firstColId, addTask, filteredTasks]);
+    toast.success("Task created");
+  }, [newTaskTitle, newTaskAssigned, newTaskDue, newTaskPriority, newTaskCol, projectId, firstColId, store]);
 
   const priorityOptions: Priority[] = ["low", "medium", "high", "urgent"];
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-[var(--board-bg)]">
-      {/* Toolbar */}
       <div className="flex items-center justify-between px-4 sm:px-6 py-2 border-b border-border bg-[var(--header-bg)] shrink-0">
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1"><span className="font-semibold text-foreground">{todo}</span> To Do</span>
@@ -91,36 +93,34 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
                 <Plus className="h-4 w-4 mr-1.5" /> Add Task
               </Button>
             } />
-            <DialogContent className="sm:max-w-[440px] rounded-xl shadow-2xl border-none p-6">
-              <DialogTitle className="text-lg font-bold tracking-tight">Create Task</DialogTitle>
-              <div className="flex flex-col gap-6 pt-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Title *</label>
-                  <Input placeholder="e.g., Design signup flow" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} className="h-10 text-sm bg-muted/30 border-muted-foreground/20 focus:border-primary/50" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleAddTask(); }} />
+            <DialogContent className="rounded-lg shadow-xl">
+              <DialogTitle className="text-sm font-semibold">Create Task</DialogTitle>
+              <div className="space-y-3 pt-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground">Title *</label>
+                  <Input placeholder="e.g., Design signup flow" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleAddTask(); }} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Column</label>
-                    <select value={newTaskCol} onChange={(e) => setNewTaskCol(e.target.value)} className="h-10 text-sm rounded-md bg-muted/30 border border-muted-foreground/20 w-full px-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20">
-                      {projColumns.map((c) => (<option key={c.id} value={c.id}>{c.title}</option>))}
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Priority</label>
-                    <select value={newTaskPriority} onChange={(e) => setNewTaskPriority(e.target.value as Priority)} className="h-10 text-sm rounded-md bg-muted/30 border border-muted-foreground/20 w-full px-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20">
-                      {priorityOptions.map((p) => (<option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>))}
-                    </select>
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground">Column</label>
+                  <select value={newTaskCol} onChange={(e) => setNewTaskCol(e.target.value)} className="h-9 text-sm rounded-md bg-background border border-input w-full px-3 text-foreground">
+                    {projColumns.map((c) => (<option key={c.id} value={c.id}>{c.title}</option>))}
+                  </select>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Assigned By</label>
-                  <Input placeholder="e.g., CEO" value={newTaskAssigned} onChange={(e) => setNewTaskAssigned(e.target.value)} className="h-10 text-sm bg-muted/30 border-muted-foreground/20" />
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground">Priority</label>
+                  <select value={newTaskPriority} onChange={(e) => setNewTaskPriority(e.target.value as Priority)} className="h-9 text-sm rounded-md bg-background border border-input w-full px-3 text-foreground">
+                    {priorityOptions.map((p) => (<option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>))}
+                  </select>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Due Date</label>
-                  <Input type="date" value={newTaskDue} onChange={(e) => setNewTaskDue(e.target.value)} className="h-10 text-sm bg-muted/30 border-muted-foreground/20" />
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground">Assigned By</label>
+                  <Input placeholder="e.g., CEO" value={newTaskAssigned} onChange={(e) => setNewTaskAssigned(e.target.value)} className="h-9 text-sm" />
                 </div>
-                <Button onClick={handleAddTask} className="w-full h-11 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 mt-2" disabled={!newTaskTitle.trim()}>Create Task</Button>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground">Due Date</label>
+                  <Input type="date" value={newTaskDue} onChange={(e) => setNewTaskDue(e.target.value)} className="h-9 text-sm" />
+                </div>
+                <Button onClick={handleAddTask} className="w-full h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-none" disabled={!newTaskTitle.trim()}>Create</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -130,14 +130,11 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
                 <Columns3 className="h-4 w-4 mr-1" /> Column
               </Button>
             } />
-            <DialogContent className="sm:max-w-[400px] rounded-xl shadow-2xl border-none p-6">
-              <DialogTitle className="text-lg font-bold tracking-tight">New Column</DialogTitle>
-              <div className="flex flex-col gap-6 pt-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[13px] font-semibold text-foreground/80 ml-0.5">Column Name</label>
-                  <Input placeholder="e.g., Done" value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} className="h-10 text-sm bg-muted/30 border-muted-foreground/20" autoFocus onKeyDown={(e) => { if (e.key === "Enter") addCol(); }} />
-                </div>
-                <Button onClick={addCol} className="w-full h-11 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 mt-2">Add Column</Button>
+            <DialogContent className="rounded-lg shadow-xl">
+              <DialogTitle className="text-sm font-semibold">New Column</DialogTitle>
+              <div className="space-y-3 pt-2">
+                <Input placeholder="Column name..." value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") addCol(); }} />
+                <Button onClick={addCol} className="w-full h-9 text-sm bg-primary hover:bg-primary/90 shadow-none">Add</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -159,7 +156,7 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="board" direction="horizontal" type="COLUMN">
               {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className="flex gap-4 h-full px-4 sm:px-6 py-4 kanban-scroll">
+                <div ref={provided.innerRef} {...provided.droppableProps} className="flex gap-4 h-full px-6 py-4 kanban-scroll">
                   {projColumns.map((col) => (
                     <KanbanColumnComponent key={col.id} column={col} />
                   ))}
