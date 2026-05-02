@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { KanbanColumn, Task, ActivityLog, Notification, Project, NewProject, NewColumn, NewTask, NewActivityLog } from "@/lib/types";
+import { api } from "@/lib/api";
 
 let counter = 0;
 const genId = () => `tak_${Date.now()}_${++counter}`;
@@ -17,21 +18,23 @@ interface KanbanState {
   isSheetOpen: boolean;
   searchQuery: string;
   currentProjectId: string | null;
+  isLoading: boolean;
 
-  addProject: (p: NewProject) => string;
-  deleteProject: (id: string) => void;
+  fetchData: () => Promise<void>;
+  addProject: (p: NewProject) => Promise<string>;
+  deleteProject: (id: string) => Promise<void>;
   setCurrentProjectId: (id: string | null) => void;
-  addColumn: (c: NewColumn) => void;
-  updateColumn: (id: string, title: string) => void;
-  deleteColumn: (id: string) => void;
-  addTask: (t: NewTask) => void;
-  updateTask: (id: string, d: Partial<Task>) => void;
-  deleteTask: (id: string) => void;
-  moveTask: (taskId: string, colId: string, pos: number) => void;
-  addActivityLog: (l: NewActivityLog) => void;
+  addColumn: (c: NewColumn) => Promise<void>;
+  updateColumn: (id: string, title: string) => Promise<void>;
+  deleteColumn: (id: string) => Promise<void>;
+  addTask: (t: NewTask) => Promise<void>;
+  updateTask: (id: string, d: Partial<Task>) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  moveTask: (taskId: string, colId: string, pos: number) => Promise<void>;
+  addActivityLog: (l: NewActivityLog) => Promise<void>;
   deleteActivityLog: (id: string) => void;
-  addNotification: (msg: string) => void;
-  clearNotifications: () => void;
+  addNotification: (msg: string) => Promise<void>;
+  clearNotifications: () => Promise<void>;
   setSelectedTask: (t: Task | null) => void;
   setIsSheetOpen: (o: boolean) => void;
   setSearchQuery: (q: string) => void;
@@ -59,54 +62,177 @@ export const useKanbanStore = create<KanbanState>()(
       isSheetOpen: false,
       searchQuery: "",
       currentProjectId: null,
+      isLoading: false,
 
-      addProject: (p) => {
+      fetchData: async () => {
+        set({ isLoading: true });
+        try {
+          const [projects, columns, tasks, logs, notifications] = await Promise.all([
+            api.getProjects(),
+            api.getColumns(),
+            api.getTasks(),
+            api.getActivityLogs(),
+            api.getNotifications(),
+          ]);
+          set({ projects, columns, tasks, activityLogs: logs, notifications, isLoading: false });
+        } catch (e) {
+          console.error("Failed to fetch data:", e);
+          set({ isLoading: false });
+        }
+      },
+
+      addProject: async (p) => {
         const id = genId();
+        const project = { id, name: p.name };
+        const cols = getDefaultCols(id);
+        
+        // Optimistic update
         set((s) => ({
-          projects: [...s.projects, { id, name: p.name }],
-          columns: [...s.columns, ...getDefaultCols(id)],
+          projects: [...s.projects, project],
+          columns: [...s.columns, ...cols],
           currentProjectId: id,
         }));
+
+        try {
+          await api.addProject(project);
+          for (const col of cols) {
+            await api.addColumn(col);
+          }
+        } catch (e) {
+          console.error(e);
+          get().fetchData(); // Rollback on error
+        }
         return id;
       },
 
-      deleteProject: (id) => set((s) => ({
-        projects: s.projects.filter((p) => p.id !== id),
-        columns: s.columns.filter((c) => c.project_id !== id),
-        tasks: s.tasks.filter((t) => t.project_id !== id),
-        activityLogs: s.activityLogs.filter((l) => !s.tasks.find((t) => t.id === l.task_id && t.project_id === id)),
-        currentProjectId: s.currentProjectId === id ? null : s.currentProjectId,
-      })),
+      deleteProject: async (id) => {
+        set((s) => ({
+          projects: s.projects.filter((p) => p.id !== id),
+          columns: s.columns.filter((c) => c.project_id !== id),
+          tasks: s.tasks.filter((t) => t.project_id !== id),
+          currentProjectId: s.currentProjectId === id ? null : s.currentProjectId,
+        }));
+        try {
+          await api.deleteProject(id);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
       setCurrentProjectId: (id) => set({ currentProjectId: id }),
 
-      addColumn: (c) => set((s) => ({ columns: [...s.columns, { id: genId(), project_id: c.project_id, title: c.title, position: c.position }] })),
-      updateColumn: (id, title) => set((s) => ({ columns: s.columns.map((c) => c.id === id ? { ...c, title } : c) })),
-      deleteColumn: (id) => set((s) => ({ columns: s.columns.filter((c) => c.id !== id), tasks: s.tasks.filter((t) => t.column_id !== id) })),
+      addColumn: async (c) => {
+        const column = { id: genId(), project_id: c.project_id, title: c.title, position: c.position };
+        set((s) => ({ columns: [...s.columns, column] }));
+        try {
+          await api.addColumn(column);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
-      addTask: (t) => set((s) => ({
-        tasks: [...s.tasks, {
+      updateColumn: async (id, title) => {
+        set((s) => ({ columns: s.columns.map((c) => c.id === id ? { ...c, title } : c) }));
+        try {
+          await api.updateColumn(id, title);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
+
+      deleteColumn: async (id) => {
+        set((s) => ({ columns: s.columns.filter((c) => c.id !== id), tasks: s.tasks.filter((t) => t.column_id !== id) }));
+        try {
+          await api.deleteColumn(id);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
+
+      addTask: async (t) => {
+        const task: Task = {
           id: genId(), project_id: t.project_id, column_id: t.column_id,
           title: t.title, description: t.description || null,
           due_date: t.due_date || null, assigned_by: t.assigned_by || null,
           priority: t.priority || "medium",
           position: t.position, created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-        }],
-      })),
+        };
+        set((s) => ({ tasks: [...s.tasks, task] }));
+        try {
+          await api.addTask(task);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
-      updateTask: (id, d) => set((s) => ({ tasks: s.tasks.map((t) => t.id === id ? { ...t, ...d, updated_at: new Date().toISOString() } : t) })),
-      deleteTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id), activityLogs: s.activityLogs.filter((l) => l.task_id !== id), selectedTask: s.selectedTask?.id === id ? null : s.selectedTask })),
+      updateTask: async (id, d) => {
+        set((s) => ({ tasks: s.tasks.map((t) => t.id === id ? { ...t, ...d, updated_at: new Date().toISOString() } : t) }));
+        try {
+          await api.updateTask(id, d);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
-      moveTask: (taskId, colId, pos) => set((s) => ({ tasks: s.tasks.map((t) => t.id === taskId ? { ...t, column_id: colId, position: pos, updated_at: new Date().toISOString() } : t) })),
+      deleteTask: async (id) => {
+        set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id), selectedTask: s.selectedTask?.id === id ? null : s.selectedTask }));
+        try {
+          await api.deleteTask(id);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
-      addActivityLog: (l) => set((s) => ({
-        activityLogs: [...s.activityLogs, { id: genId(), task_id: l.task_id, type: l.type, content: l.content, target_date: l.target_date || null, created_at: new Date().toISOString() }],
-      })),
+      moveTask: async (taskId, colId, pos) => {
+        set((s) => ({ tasks: s.tasks.map((t) => t.id === taskId ? { ...t, column_id: colId, position: pos, updated_at: new Date().toISOString() } : t) }));
+        try {
+          await api.updateTask(taskId, { column_id: colId, position: pos });
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
+
+      addActivityLog: async (l) => {
+        const log = { id: genId(), task_id: l.task_id, type: l.type, content: l.content, target_date: l.target_date || null, created_at: new Date().toISOString() };
+        set((s) => ({ activityLogs: [...s.activityLogs, log] }));
+        try {
+          await api.addActivityLog(log);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
       deleteActivityLog: (id) => set((s) => ({ activityLogs: s.activityLogs.filter((l) => l.id !== id) })),
 
-      addNotification: (msg) => set((s) => ({ notifications: [{ id: genId(), message: msg, created_at: new Date().toISOString() }, ...s.notifications] })),
-      clearNotifications: () => set({ notifications: [] }),
+      addNotification: async (msg) => {
+        const n = { id: genId(), message: msg, created_at: new Date().toISOString() };
+        set((s) => ({ notifications: [n, ...s.notifications] }));
+        try {
+          await api.addNotification(n);
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
+
+      clearNotifications: async () => {
+        set({ notifications: [] });
+        try {
+          await api.clearNotifications();
+        } catch (e) {
+          console.error(e);
+          get().fetchData();
+        }
+      },
 
       setSelectedTask: (t) => set({ selectedTask: t }),
       setIsSheetOpen: (o) => set({ isSheetOpen: o }),

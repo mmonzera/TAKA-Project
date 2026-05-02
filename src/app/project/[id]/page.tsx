@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useKanbanStore } from "@/hooks/use-store";
 import { useTheme } from "@/components/theme/theme-provider";
 import { KanbanBoardProject } from "@/components/kanban/kanban-board-project";
@@ -12,7 +13,12 @@ export default function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { theme, toggle } = useTheme();
-  const { projects, deleteProject } = useKanbanStore();
+  const { projects, deleteProject, fetchData } = useKanbanStore();
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const project = projects.find((p) => p.id === id);
 
   if (!project) {

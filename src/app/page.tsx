@@ -23,8 +23,12 @@ export default function DashboardPage() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const { user, loading: authLoading, signOut } = useAuth();
-  const { projects, addProject, deleteProject, setCurrentProjectId, tasks, columns, notifications, clearNotifications } = useKanbanStore();
+  const { projects, addProject, deleteProject, setCurrentProjectId, tasks, columns, notifications, clearNotifications, fetchData } = useKanbanStore();
   const { generateNotifications } = useNotificationEngine();
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login");
