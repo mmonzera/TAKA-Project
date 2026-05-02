@@ -152,16 +152,16 @@ export default function DashboardPage() {
                 <span className="text-xs font-semibold flex items-center gap-2 mb-1">
                   <Settings2 className="h-4 w-4 text-primary" /> Reminder Settings
                 </span>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-[11px] font-medium text-muted-foreground">Due Date (days before)</label>
                   <Input value={prefs.dueDateDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, dueDateDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0, 1, 3, 5" className="h-8 text-xs bg-muted/50 border-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5"><Clock className="h-3 w-3" /> Confirming</label>
                     <Input value={prefs.confirmingDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, confirmingDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0" className="h-8 text-xs bg-muted/50 border-none" />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5"><Bell className="h-3 w-3" /> Reminding</label>
                     <Input value={prefs.remindingDays.join(", ")} onChange={(e) => setPrefs((p) => ({ ...p, remindingDays: e.target.value.split(",").map((s) => parseInt(s.trim())).filter((n) => !isNaN(n)) }))} placeholder="0" className="h-8 text-xs bg-muted/50 border-none" />
                   </div>
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                   <DialogContent className="rounded-lg shadow-xl">
                     <DialogTitle className="text-sm font-semibold">Create Project</DialogTitle>
                     <div className="space-y-4 pt-2">
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <label className="text-xs font-medium text-muted-foreground">Project Name</label>
                         <Input placeholder="e.g., Marketing Campaign" value={projectName} onChange={(e) => setProjectName(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleCreateProject(); }} />
                       </div>

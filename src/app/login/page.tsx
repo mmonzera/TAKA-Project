@@ -51,11 +51,11 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="px-6 pb-6">
             <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-sm font-medium text-foreground">Email</label>
                 <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10 text-sm" autoFocus />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-sm font-medium text-foreground">Password</label>
                 <div className="relative">
                   <Input type={showPw ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-10 text-sm pr-10" />

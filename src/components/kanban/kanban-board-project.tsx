@@ -94,27 +94,27 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
             <DialogContent className="rounded-lg shadow-xl">
               <DialogTitle className="text-sm font-semibold">Create Task</DialogTitle>
               <div className="space-y-3 pt-2">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Title *</label>
                   <Input placeholder="e.g., Design signup flow" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleAddTask(); }} />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Column</label>
                   <select value={newTaskCol} onChange={(e) => setNewTaskCol(e.target.value)} className="h-9 text-sm rounded-md bg-background border border-input w-full px-3 text-foreground">
                     {projColumns.map((c) => (<option key={c.id} value={c.id}>{c.title}</option>))}
                   </select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Priority</label>
                   <select value={newTaskPriority} onChange={(e) => setNewTaskPriority(e.target.value as Priority)} className="h-9 text-sm rounded-md bg-background border border-input w-full px-3 text-foreground">
                     {priorityOptions.map((p) => (<option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>))}
                   </select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Assigned By</label>
                   <Input placeholder="e.g., CEO" value={newTaskAssigned} onChange={(e) => setNewTaskAssigned(e.target.value)} className="h-9 text-sm" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Due Date</label>
                   <Input type="date" value={newTaskDue} onChange={(e) => setNewTaskDue(e.target.value)} className="h-9 text-sm" />
                 </div>
@@ -131,7 +131,7 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
             <DialogContent className="rounded-lg shadow-xl">
               <DialogTitle className="text-sm font-semibold">New Column</DialogTitle>
               <div className="space-y-4 pt-2">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Column Name</label>
                   <Input placeholder="e.g., Done" value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") addCol(); }} />
                 </div>

@@ -85,7 +85,7 @@ export function TaskDetailSheet() {
         </SheetHeader>
         <ScrollArea className="flex-1 px-4 sm:px-5 py-4">
           <div className="space-y-5">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><ArrowUp className="h-3 w-3" />Priority</label>
               <div className="flex gap-1.5">
                 {priorityOptions.map((op) => (
@@ -102,16 +102,16 @@ export function TaskDetailSheet() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><User className="h-3 w-3" />Assigned By</label>
                 <Input value={a} onChange={(e) => setA(e.target.value)} placeholder="Who assigned this?" className="h-9 text-sm" />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Due Date</label>
                 <Input type="date" value={dd} onChange={(e) => setDd(e.target.value)} className="h-9 text-sm" />
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-xs font-medium text-muted-foreground">Description</label>
               <Textarea value={d} onChange={(e) => setD(e.target.value)} placeholder="Add details, references..." className="min-h-[100px] text-sm" />
             </div>
@@ -141,7 +141,7 @@ export function TaskDetailSheet() {
                 <Plus className="h-3.5 w-3.5 mr-1" /> Add Log
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {logs.length === 0 ? (
                 <p className="text-xs text-muted-foreground/60 text-center py-4">No activity logs yet.</p>
               ) : (
