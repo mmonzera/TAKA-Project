@@ -1,6 +1,15 @@
 export interface Project {
+  
   id: string;
   name: string;
+}
+
+export interface RelatedDoc {
+  id: string;
+  project_id: string;
+  title: string;
+  url: string;
+  created_at: string;
 }
 
 export interface KanbanColumn {
@@ -11,7 +20,6 @@ export interface KanbanColumn {
 }
 
 export type Priority = "low" | "medium" | "high" | "urgent";
-
 export interface Task {
   id: string;
   project_id: string;
@@ -54,3 +62,5 @@ export type NewTask = Pick<Task, "title" | "column_id" | "project_id" | "positio
 export type NewActivityLog = Pick<ActivityLog, "task_id" | "type" | "content"> & {
   target_date?: string;
 };
+export type NewDoc = Pick<RelatedDoc, "project_id" | "title" | "url">;
+
