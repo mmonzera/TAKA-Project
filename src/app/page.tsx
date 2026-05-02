@@ -40,9 +40,9 @@ export default function DashboardPage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [prefs, setPrefs] = useState<NotifPrefs>({ dueDateDays: [0, 1, 3, 5], confirmingDays: [0], remindingDays: [0] });
 
-  const handleCreateProject = useCallback(() => {
+  const handleCreateProject = useCallback(async () => {
     if (!projectName.trim()) return;
-    const id = addProject({ name: projectName.trim() });
+    const id = await addProject({ name: projectName.trim() });
     setProjectName("");
     setOpen(false);
     toast.success("Project created");

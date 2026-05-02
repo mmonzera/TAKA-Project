@@ -43,23 +43,23 @@ export function TaskDetailSheet() {
     }
   }, [selectedTask]);
 
-  const save = useCallback(() => {
+  const save = useCallback(async () => {
     if (!selectedTask) return;
-    updateTask(selectedTask.id, { title: t, description: d || null, assigned_by: a || null, due_date: dd ? new Date(dd).toISOString() : null, priority: p });
+    await updateTask(selectedTask.id, { title: t, description: d || null, assigned_by: a || null, due_date: dd ? new Date(dd).toISOString() : null, priority: p });
     toast.success("Saved");
   }, [selectedTask, t, d, a, dd, p, updateTask]);
 
-  const del = useCallback(() => {
+  const del = useCallback(async () => {
     if (!selectedTask) return;
-    deleteTask(selectedTask.id);
+    await deleteTask(selectedTask.id);
     setIsSheetOpen(false);
     setSelectedTask(null);
     toast.success("Deleted");
   }, [selectedTask, deleteTask, setIsSheetOpen, setSelectedTask]);
 
-  const addLog = useCallback(() => {
+  const addLog = useCallback(async () => {
     if (!selectedTask || !lc.trim()) return;
-    addActivityLog({ task_id: selectedTask.id, type: lt, content: lc.trim(), target_date: ltd || undefined });
+    await addActivityLog({ task_id: selectedTask.id, type: lt, content: lc.trim(), target_date: ltd || undefined });
     setLc(""); setLtd("");
   }, [selectedTask, lc, lt, ltd, addActivityLog]);
 

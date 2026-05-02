@@ -47,16 +47,16 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
     moveTask(r.draggableId, r.destination.droppableId, r.destination.index);
   }, [moveTask]);
 
-  const addCol = useCallback(() => {
+  const addCol = useCallback(async () => {
     if (!newColTitle.trim()) return;
     if (projColumns.length >= 10) { toast.error("Max 10 columns"); return; }
-    addColumn({ title: newColTitle.trim(), position: projColumns.length, project_id: projectId });
+    await addColumn({ title: newColTitle.trim(), position: projColumns.length, project_id: projectId });
     setNewColTitle(""); setAddColOpen(false);
   }, [newColTitle, projColumns.length, projectId, addColumn]);
 
-  const handleAddTask = useCallback(() => {
+  const handleAddTask = useCallback(async () => {
     if (!newTaskTitle.trim() || !newTaskCol) return;
-    addTask({
+    await addTask({
       title: newTaskTitle.trim(),
       column_id: newTaskCol,
       project_id: projectId,
