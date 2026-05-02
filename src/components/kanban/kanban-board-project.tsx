@@ -130,9 +130,12 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
             } />
             <DialogContent className="rounded-lg shadow-xl">
               <DialogTitle className="text-sm font-semibold">New Column</DialogTitle>
-              <div className="space-y-3 pt-2">
-                <Input placeholder="Column name..." value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") addCol(); }} />
-                <Button onClick={addCol} className="w-full h-9 text-sm bg-primary hover:bg-primary/90 shadow-none">Add</Button>
+              <div className="space-y-4 pt-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">Column Name</label>
+                  <Input placeholder="e.g., Done" value={newColTitle} onChange={(e) => setNewColTitle(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") addCol(); }} />
+                </div>
+                <Button onClick={addCol} className="w-full h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-none">Add</Button>
               </div>
             </DialogContent>
           </Dialog>

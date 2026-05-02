@@ -96,7 +96,7 @@ export default function ProjectPage() {
                     <p className="text-[11px]">No notifications</p>
                   </div>
                 ) : (
-                  <div className="p-2 space-y-1">
+                  <div className="p-2 space-y-2">
                     {notifications.map((n) => (
                       <div key={n.id} className="px-3 py-2.5 rounded hover:bg-accent/50 transition-colors border border-transparent hover:border-border/40 text-[11px] text-foreground leading-relaxed group relative">
                         {n.message}

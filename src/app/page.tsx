@@ -137,7 +137,7 @@ export default function DashboardPage() {
                     <p className="text-[11px]">No notifications</p>
                   </div>
                 ) : (
-                  <div className="p-2 space-y-1">
+                  <div className="p-2 space-y-2">
                     {notifications.map((n) => (
                       <div key={n.id} className="px-3 py-2.5 rounded hover:bg-accent/50 transition-colors border border-transparent hover:border-border/40 text-[11px] text-foreground leading-relaxed group relative">
                         {n.message}
@@ -218,8 +218,11 @@ export default function DashboardPage() {
                   } />
                   <DialogContent className="rounded-lg shadow-xl">
                     <DialogTitle className="text-sm font-semibold">Create Project</DialogTitle>
-                    <div className="space-y-3 pt-2">
-                      <Input placeholder="Project name..." value={projectName} onChange={(e) => setProjectName(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleCreateProject(); }} />
+                    <div className="space-y-4 pt-2">
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">Project Name</label>
+                        <Input placeholder="e.g., Marketing Campaign" value={projectName} onChange={(e) => setProjectName(e.target.value)} className="h-9 text-sm" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleCreateProject(); }} />
+                      </div>
                       <Button onClick={handleCreateProject} className="w-full h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-none" disabled={!projectName.trim()}>Create</Button>
                     </div>
                   </DialogContent>
