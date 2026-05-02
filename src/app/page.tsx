@@ -108,7 +108,7 @@ export default function DashboardPage() {
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           <Popover open={notifOpen} onOpenChange={(v) => { setNotifOpen(v); if (!v) setShowSettings(false); }}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger render={
               <Button variant="ghost" size="icon" className="relative h-8 w-8 text-muted-foreground hover:text-foreground">
                 <Bell className="h-4 w-4" />
                 {notifications.length > 0 && (
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                   </span>
                 )}
               </Button>
-            </PopoverTrigger>
+            } />
             <PopoverContent align="end" sideOffset={8} className="w-[340px] p-0 rounded-lg shadow-xl overflow-hidden">
               <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border bg-muted/30">
                 <span className="text-xs font-semibold flex items-center gap-2">
