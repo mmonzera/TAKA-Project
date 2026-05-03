@@ -26,36 +26,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    try {
+      const init = async () => {
+        try {
+          const res: any = await supabase.auth.getSession();
+          const s = res?.data?.session ?? null;
+          setSession(s);
+          setUser(s?.user ?? null);
+        } catch {
+          // noop
+        }
+        setLoading(false);
+      };
+      init();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      const sub: any = supabase.auth.onAuthStateChange((_event: any, s: any) => {
+        setSession(s);
+        setUser(s?.user ?? null);
+        setLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+      return () => {
+        if (sub?.data?.subscription?.unsubscribe) sub.data.subscription.unsubscribe();
+      };
+    } catch {
+      setLoading(false);
+      return () => {};
+    }
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message || null };
+    try {
+      const { error }: any = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error?.message || null };
+    } catch (e: any) {
+      return { error: e?.message || "Login failed" };
+    }
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { full_name: name } },
-    });
-    return { error: error?.message || null };
+    try {
+      const { error }: any = await supabase.auth.signUp({
+        email, password,
+        options: { data: { full_name: name } },
+      });
+      return { error: error?.message || null };
+    } catch (e: any) {
+      return { error: e?.message || "Signup failed" };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try { await supabase.auth.signOut(); } catch {}
   };
 
   return (
