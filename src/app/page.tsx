@@ -42,13 +42,18 @@ export default function DashboardPage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [prefs, setPrefs] = useState<NotifPrefs>({ dueDateDays: [0, 1, 3, 5], confirmingDays: [0], remindingDays: [0] });
 
-  const handleCreateProject = useCallback(() => {
+  const handleCreateProject = useCallback(async () => {
     if (!projectName.trim()) return;
     setOpen(false);
-    const id = addProject({ name: projectName.trim() });
-    setProjectName("");
-    toast.success("Project created");
-    setTimeout(() => router.push(`/project/${id}`), 50);
+    try {
+      const id = await addProject({ name: projectName.trim() });
+      setProjectName("");
+      toast.success("Project created");
+      router.push(`/project/${id}`);
+    } catch (error) {
+      toast.error("Failed to create project");
+      console.error(error);
+    }
   }, [projectName, addProject, router]);
 
   const goToProject = useCallback((id: string) => {
