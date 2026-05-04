@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useKanbanStore } from "@/hooks/use-store";
 import { useTheme } from "@/components/theme/theme-provider";
 import { KanbanBoardProject } from "@/components/kanban/kanban-board-project";
@@ -18,8 +18,13 @@ export default function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { theme, toggle } = useTheme();
-  const { projects, deleteProject, notifications, clearNotifications, addRelatedDoc, deleteRelatedDoc, getProjectDocs } = useKanbanStore();
+  const { projects, deleteProject, notifications, clearNotifications, addRelatedDoc, deleteRelatedDoc, getProjectDocs, fetchData } = useKanbanStore();
   const { generateNotifications } = useNotificationEngine();
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const [notifOpen, setNotifOpen] = useState(false);
   const [prefs, setPrefs] = useState<NotifPrefs>({ dueDateDays: [0, 1, 3, 5], confirmingDays: [0], remindingDays: [0] });
   const [docDialogOpen, setDocDialogOpen] = useState(false);
@@ -72,7 +77,7 @@ export default function ProjectPage() {
           <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={toggle}>
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          
+
           {/* Notifications + Reminder Settings */}
           <Popover open={notifOpen} onOpenChange={setNotifOpen}>
             <PopoverTrigger render={

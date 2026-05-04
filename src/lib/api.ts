@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Project, KanbanColumn, Task, ActivityLog, Notification, NewProject, NewColumn, NewTask, NewActivityLog } from "./types";
+import type { Project, KanbanColumn, Task, ActivityLog, Notification, RelatedDoc, NewProject, NewColumn, NewTask, NewActivityLog, NewDoc } from "./types";
 
 export const api = {
   // Projects
@@ -65,6 +65,10 @@ export const api = {
     const { error } = await supabase.from("activity_logs").insert(l);
     if (error) throw error;
   },
+  deleteActivityLog: async (id: string) => {
+    const { error } = await supabase.from("activity_logs").delete().eq("id", id);
+    if (error) throw error;
+  },
 
   // Notifications
   getNotifications: async () => {
@@ -78,6 +82,21 @@ export const api = {
   },
   clearNotifications: async () => {
     const { error } = await supabase.from("notifications").delete().neq("id", "");
+    if (error) throw error;
+  },
+
+  // Related Docs
+  getRelatedDocs: async () => {
+    const { data, error } = await supabase.from("related_docs").select("*").order("created_at", { ascending: false });
+    if (error) throw error;
+    return data as RelatedDoc[];
+  },
+  addRelatedDoc: async (d: RelatedDoc) => {
+    const { error } = await supabase.from("related_docs").insert(d);
+    if (error) throw error;
+  },
+  deleteRelatedDoc: async (id: string) => {
+    const { error } = await supabase.from("related_docs").delete().eq("id", id);
     if (error) throw error;
   },
 };
