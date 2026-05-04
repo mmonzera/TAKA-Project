@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,11 @@ export function KanbanBoardProject({ projectId }: { projectId: string }) {
   );
 
   const firstColId = projColumns[0]?.id || "";
+
+  // Reset task column when project changes
+  useEffect(() => {
+    setNewTaskCol(firstColId);
+  }, [projectId, firstColId]);
 
   const { todo, progress, done } = useMemo(() => {
     const colMap = new Map(columns.map((c) => [c.id, c.title]));
